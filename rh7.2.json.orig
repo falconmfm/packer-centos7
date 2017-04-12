@@ -1,0 +1,45 @@
+install
+cdrom
+lang es_ES.UTF-8
+keyboard es
+timezone Europe/Madrid --isUtc
+rootpw --plaintext root01
+user --name=vagrant --groups=users,wheel --password=vagrant
+rootpw $1$a0LBhbRU$76.RFqZ/1.kY8UjhNYBQN. --iscrypted
+reboot
+text
+bootloader --location=mbr --append="rhgb quiet crashkernel=auto"
+zerombr
+clearpart --all --initlabel
+volgroup vgroot --pesize=4096 pv.0 
+part pv.0 --fstype=lvmpv --ondisk=sda --size=16384
+volgroup vgimport --pesize=4096 pv.1 
+part pv.1 --fstype=lvmpv --ondisk=sda --size=20480
+logvol /boot --vgname=vgroot --name=lvboot --fstype=ext4 --size=1024
+logvol /var --vgname=vgroot --name=lvvar --fstype=xfs --size=3096
+logvol /usr --vgname=vgroot --name=lvusr --fstype=xfs --size=8192
+logvol /home --vgname=vgroot --name=lvhome --fstype=xfs --size=2048
+logvol /opt --vgname=vgroot --name=lvopt --fstype=xfs --size=1024
+logvol /import --vgname=vgimport --name=lvimport --fstype=xfs --size=1024
+auth --passalgo=sha512 --useshadow
+selinux --disabled
+firewall --disabled
+skipx
+firstboot --disable
+reboot
+ 
+%packages --instLangs=es_ES.utf8 --nobase --ignoremissing --excludedocs
+ 
+@core
+%end
+ 
+%post --log=/root/ks.log
+
+cat > /etc/sudoers.d/vagrant <<EOM
+Defaults:vagrant !requiretty
+vagrant ALL=(ALL) NOPASSWD: ALL
+EOM
+chmod 0440 /etc/sudoers.d/vagrant
+ 
+yum -y update
+%end
