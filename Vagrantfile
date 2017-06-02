@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "virtualbox" do |virtualbox|
     virtualbox.vm.hostname = "virtualbox-centos7"
     virtualbox.vm.box = "centOS7"
-    virtualbox.vm.network :private_network, ip: "172.16.3.2"
+   # virtualbox.vm.network :private_network, ip: "172.16.3.2"
 
     config.vm.provider :virtualbox do |v|
       v.gui = false
